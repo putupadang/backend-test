@@ -17,7 +17,11 @@ class AuthController extends Controller
     ]);
 
     $user = User::login($request)->first();
-    if ($user && Hash::check($request->password, $user->password)) {
+    if (!$user) {
+      return response()->json(['status' => '404', 'message' => 'user not found!'], 404);
+    }
+
+    if (Hash::check($request->password, $user->password)) {
       //create token
       Auth::loginUsingId($user->id);
       $user = Auth::user();
@@ -27,7 +31,7 @@ class AuthController extends Controller
 
       return response()->json(['status' => '200', 'data' => $data], 200);
     } else {
-      return response()->json(['status' => '400', 'message' => 'username or password invalid!'], 400);
+      return response()->json(['status' => '400', 'message' => 'your password is not valid!'], 400);
     }
   }
 }
